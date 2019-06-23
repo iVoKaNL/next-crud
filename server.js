@@ -22,6 +22,12 @@ app
       app.render(req, res, actualPage, queryParams)
     })
 
+    server.get('/contacts/delete/:id', (req, res) => {
+      const actualPage = '/contacts/delete'
+      const queryParams = { id: req.params.id }
+      app.render(req, res, actualPage, queryParams)
+    })
+
     server.get('*', (req, res) => {
       return handle(req, res)
     })

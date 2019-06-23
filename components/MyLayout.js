@@ -1,5 +1,7 @@
 import Header from './Header'
 import '../style/index.css'
+import '../style/alert.css'
+import '../style/popup.css'
 
 const layoutStyle = {
   margin: 20,

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Fragment } from 'react'
 
 const linkStyle = {
   marginRight: 15
@@ -24,7 +25,7 @@ function PageLink({ page }) {
 
 export default function Header(props) {
   return (
-    <div>
+    <Fragment>
       {getStandardPages().map(page => (
         <PageLink key={page.link} page={page} />
       ))}
@@ -40,6 +41,6 @@ export default function Header(props) {
           <PageLink key={extraPage.link} page={extraPage} />
         ))
       }
-    </div>
+    </Fragment>
   )
 }

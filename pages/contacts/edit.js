@@ -1,8 +1,8 @@
-import Layout from '../../components/MyLayout.js';
-import Link from 'next/link';
-import fetch from 'isomorphic-unfetch';
-import { contactPages, removePageByIndex } from '../../apis/contacts/Pages'
-import React, { Component } from 'react';
+import Layout from '../../components/MyLayout.js'
+import fetch from 'isomorphic-unfetch'
+import { contactPages } from '../../apis/contacts/Pages'
+import React, { Component } from 'react'
+import Router from 'next/router'
 
 class Edit extends Component {
     constructor(props) {
@@ -12,12 +12,14 @@ class Edit extends Component {
             name: props.contact.name,
             email: props.contact.email,
             phone: props.contact.phone,
+            message: '<strong>Success!</strong> Updated contact!',
+            alertType: 'success',
+            showAlert: false,
         }
     }
 
     handleSubmit = event => {
-        const contact = event.target;
-        console.log('id: ' + contact.id.value + '      name: ' + contact.name.value + '       email: ' + contact.email.value + '        phone: ' + contact.phone.value)
+        //console.log('id: ' + this.state.id + '      name: ' + this.state.name + '       email: ' + this.state.email + '        phone: ' + this.state.phone)
     
         const res = fetch(`http://127.0.0.1:8080/contacts/update/${this.state.id}`, {
             method: 'PUT',
@@ -26,16 +28,35 @@ class Edit extends Component {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                'name': contact.name.value,
-                'email': contact.email.value,
-                'phone': contact.phone.value,
+                'name': this.state.name,
+                'email': this.state.email,
+                'phone': this.state.phone,
             })
         }).then(res => res.json())
             .then((result) => {
                 console.log(result)
+
+                if (result.error == null) {
+                    this.setState({
+                        message: `<strong>Success!</strong> Updated contact!`,
+                        alertType: 'success',
+                        showAlert: true,
+                    })
+                } else {
+                    this.setState({
+                        message: `<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> ${result.error}`,
+                        alertType: 'error',
+                        showAlert: true,
+                    })
+                }
             },
             (error) => {
                 console.log(error)
+                this.setState({
+                    message: error,
+                    alertType: 'error',
+                    showAlert: true,
+                })
             });
         event.preventDefault();
     }
@@ -44,17 +65,22 @@ class Edit extends Component {
         const target = event.target
         const value = target.type === 'checkbox' ? target.checked : target.value
         const name = target.name
-    
+
         this.setState({
             [name]: value
-          });
-      }
+        });
+    }
+
+    handleClose = event => {
+        this.setState({ showAlert: false })
+        Router.push('/contacts/all')
+    }
 
 
     render() {
         return (
             <Layout extraPages={contactPages}>
-                <h1>Update {this.props.contact.name} with id: {this.props.contact.id}</h1>
+                <h1>Update {this.state.name} with id: {this.props.contact.id}</h1>
                 <form onSubmit={this.handleSubmit} encType="application/json">
                     <label>
                         Name:
@@ -70,6 +96,10 @@ class Edit extends Component {
                     </label>
                     <input type="submit" value="Submit" />
                 </form>
+                <div className={`alert ${this.state.alertType} ${this.state.showAlert ? 'show':'hide'}`}>
+                    <span className="closebtn" onClick={this.handleClose}>&times;</span> 
+                    <span dangerouslySetInnerHTML={{__html: this.state.message}}></span>
+                </div>
             </Layout>
         )
     }
@@ -84,6 +114,5 @@ class Edit extends Component {
         return { contact };
     };
 }
-
 
 export default Edit

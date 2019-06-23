@@ -70,3 +70,5 @@ export default function Index() {
         </Layout>
     )
 }
+
+//https://devhints.io/react

@@ -1,0 +1,33 @@
+/* The alert message box */
+.popup {
+    padding: 20px;
+    color: black;
+    background-color: #ddffff;
+    border-style: none none none solid;
+    border-color: #2196F3;
+    border-width: 5px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.popup.error {background-color: #ffdddd; border-color: #f44336;}
+.popup.success {background-color: #ddffdd; border-color: #4CAF50;}
+.popup.info {background-color: #ddffff; border-color: #2196F3;}
+.popup.warning {background-color: #ffffcc; border-color: #ff9800;}
+
+.popup.error > .closebtn {color: lightcoral;}
+.popup.success > .closebtn {color: lightgreen;}
+.popup.info > .closebtn {color: lightblue;}
+.popup.warning > .closebtn {color: lightsalmon;}
+  
+/* When moving the mouse over the close button */
+.popup > .closebtn:hover {
+    color: black;
+}
+
+.popup > span.button-container > button {
+    margin-left: 5px;
+}
