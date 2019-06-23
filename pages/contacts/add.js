@@ -36,28 +36,27 @@ class Add extends Component {
         console.log(result)
 
         if (result.error == null) {
-          this.setState({
-            message: `<strong>Success!</strong> Added contact!`,
-            alertType: 'success',
-            showAlert: true,
-          })
+          this.redirectToContacts(`<strong>Success!</strong> Added contact!`, 'success', true)
         } else {
-          this.setState({
-            message: `<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> ${result.error}`,
-            alertType: 'error',
-            showAlert: true,
-          })
+          this.redirectToContacts(`<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> ${result.error}`, 'error', true)
         }
       },
       (error) => {
         console.log(error)
-        this.setState({
-          message: error,
-          alertType: 'error',
-          showAlert: true,
-        })
+        this.redirectToContacts(error, 'error', true)
       })
     event.preventDefault()
+  }
+
+  redirectToContacts = ( message, alertType, showAlert ) => {
+    Router.push({
+        pathname: '/contacts/all',
+        query: {
+            message,
+            alertType,
+            showAlert,
+        }
+    }, '/contacts/all')
   }
 
   handleInputChange = event => {

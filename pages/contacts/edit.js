@@ -3,6 +3,7 @@ import fetch from 'isomorphic-unfetch'
 import { contactPages } from '../../apis/contacts/Pages'
 import React, { Component } from 'react'
 import Router from 'next/router'
+import Alert from '../../components/Alert.js';
 
 class Edit extends Component {
     constructor(props) {
@@ -37,28 +38,28 @@ class Edit extends Component {
                 console.log(result)
 
                 if (result.error == null) {
-                    this.setState({
-                        message: `<strong>Success!</strong> Updated contact!`,
-                        alertType: 'success',
-                        showAlert: true,
-                    })
+                    this.redirectToContact(`<strong>Success!</strong> Updated contact!`, 'success', true)
                 } else {
-                    this.setState({
-                        message: `<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> ${result.error}`,
-                        alertType: 'error',
-                        showAlert: true,
-                    })
+                    this.redirectToContact(`<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> ${result.error}`, 'error', true)
                 }
             },
             (error) => {
                 console.log(error)
-                this.setState({
-                    message: error,
-                    alertType: 'error',
-                    showAlert: true,
-                })
-            });
-        event.preventDefault();
+                this.redirectToContact(error, 'error', true)
+            })
+        event.preventDefault()
+    }
+
+    redirectToContact = ( message, alertType, showAlert ) => {
+        Router.push({
+            pathname: '/contacts/view',
+            query: {
+                id: this.state.id,
+                message,
+                alertType,
+                showAlert,
+            }
+        }, 'contacts/view/'+this.state.id)
     }
     
     handleInputChange = event => {
@@ -70,12 +71,6 @@ class Edit extends Component {
             [name]: value
         });
     }
-
-    handleClose = event => {
-        this.setState({ showAlert: false })
-        Router.push('/contacts/all')
-    }
-
 
     render() {
         return (
@@ -96,10 +91,6 @@ class Edit extends Component {
                     </label>
                     <input type="submit" value="Submit" />
                 </form>
-                <div className={`alert ${this.state.alertType} ${this.state.showAlert ? 'show':'hide'}`}>
-                    <span className="closebtn" onClick={this.handleClose}>&times;</span> 
-                    <span dangerouslySetInnerHTML={{__html: this.state.message}}></span>
-                </div>
             </Layout>
         )
     }

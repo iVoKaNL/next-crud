@@ -4,6 +4,7 @@ import { contactPages } from '../../apis/contacts/Pages'
 import React, { Component, Fragment } from 'react'
 import ContactTable from '../../apis/contacts/components/ContactTable'
 import Router from 'next/router'
+import Popup from '../../components/Popup'
 
 class Delete extends Component {
     constructor(props) {
@@ -17,8 +18,6 @@ class Delete extends Component {
             message: props.contact == null ? 'Something went wrong! The contact you\'re trying to delete is probably already deleted.':'Are you sure you want to <strong>delete</strong> this contact?',
             alertType: props.contact == null ? 'error':'info',
             showAlert: true,
-            popup: props.contact == null ? false:true,
-            error: props.contact == null ? true : false,
         }
         Router.events.on('routeChangeComplete', (url) => {
             this.setState({ showAlert: true })
@@ -34,26 +33,27 @@ class Delete extends Component {
                 console.log(result)
 
                 if (result.status == 200 && result.ok) {
-                    this.setState({
-                        message: `<strong>Success!</strong> Removed contact!`,
-                        alertType: 'success',
-                    })
+                    this.redirectToContacts(`<strong>Success!</strong> Removed contact!`, 'success', true)
                 } else {
-                    this.setState({
-                        message: `<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> Contact is probably already deleted.`,
-                        alertType: 'error',
-                    })
+                    this.redirectToContacts(`<strong>Error!</strong> Something went wrong while adding the contact! <br /><br /> <strong>Error message:</strong> Contact is probably already deleted.`, 'error', true)
                 }
             },
             (error) => {
                 console.log(error)
-                this.setState({
-                    message: error,
-                    alertType: 'error',
-                })
-            });
+                this.redirectToContacts(error, 'error', true)
+            }
+        );
+    }
 
-        this.setState({ showAlert: true, popup: false })
+    redirectToContacts = ( message, alertType, showAlert ) => {
+        Router.push({
+            pathname: '/contacts/all',
+            query: {
+                message,
+                alertType,
+                showAlert,
+            }
+        }, '/contacts/all')
     }
     
     handleInputChange = event => {
@@ -68,6 +68,7 @@ class Delete extends Component {
 
     handleNo = event => {
         this.setState({ showAlert: false })
+        Router.replace('/contacts/delete/'+this.state.id)
     }
 
     handleClose = () => {
@@ -79,20 +80,25 @@ class Delete extends Component {
         return (
             <Layout extraPages={contactPages}>
                 <ContactTable contact={this.state.contact} showName={true} />
-                <div className={`${this.state.popup ? 'popup':'alert'} ${this.state.alertType} ${this.state.showAlert ? 'show':'hide'}`}>
-                    <span dangerouslySetInnerHTML={{__html: this.state.message}}></span>
-                    { this.state.popup
-                        ? (
-                            <Fragment>
-                                <br /><br />
-                                <span className="float-right button-container">
-                                    <button className="button muted-button" onClick={this.handleDelete}>Yes</button>
-                                    <button className="button" onClick={this.handleNo}>No</button>
-                                </span>
-                            </Fragment>)
-                        : <span className="closebtn" onClick={this.handleClose}>&times;</span> 
-                    }
-                </div>
+                <Popup 
+                    message={this.state.message} 
+                    alertType={this.state.alertType} 
+                    showAlert={this.state.showAlert} 
+                    buttons={[
+                        {
+                            key: 'yes',
+                            className: 'button muted-button',
+                            message: 'Yes',
+                            handler: this.handleDelete,
+                        },
+                        {
+                            key: 'no',
+                            className: 'button',
+                            message: 'No',
+                            handler: this.handleNo,
+                        },
+                    ]}
+                />
             </Layout>
         )
     }
